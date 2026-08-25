@@ -1,6 +1,3 @@
--- Rivals: 全コスメアンロック + エイムアシスト（統合版）
--- 注意：使用は自己責任です
-
 local __a1b2c3 = setmetatable({}, { 
     __index = function(__d4e5f6, __g7h8i9) 
         local __j0k1l2, __m3n4o5 = pcall(function() 
@@ -24,7 +21,6 @@ local _pscripts = _lp.PlayerScripts
 local _ctrl = _pscripts.Controllers
 local _mods = _rs:WaitForChild("Modules", 10)
 
--- ========== パート1: コスメアンロック ==========
 local _enumLib = require(_mods:WaitForChild("EnumLibrary", 10))
 if _enumLib then pcall(function() _enumLib:WaitForEnumBuilder() end) end
 
@@ -132,7 +128,6 @@ local function _isCosType(cosObj)
     return false
 end
 
--- コスメ所有権の書き換え
 _cosLib.OwnsCosmeticNormally = function(self, inv, nm, wep)
     local c = _cosLib.Cosmetics[nm]
     if c and c.Type == "Skin" then return true end
@@ -344,9 +339,45 @@ if _vmMod then
     end
 end
 
-print("[統合] コスメアンロック読み込み完了")
 
--- ========== パート2: エイムアシスト ==========
+if game.GameId == 6035872082 then
+    local Storage = game:GetService("ReplicatedStorage")
+    local Items = require(Storage.Modules.ItemLibrary).Items
+
+    -- 銃の高速化（スナイパーなどは除外）
+    local gunExceptions = {
+        ["Sniper"] = false,
+        ["Crossbow"] = false,
+        ["Bow"] = false,
+        ["RPG"] = false,
+    }
+
+    for name, data in pairs(Items) do
+        if typeof(data) == "table" and not gunExceptions[name] then
+            if data.ShootSpread then data.ShootSpread = 0 end
+            if data.ShootAccuracy then data.ShootAccuracy = 0 end
+            if data.ShootRecoil then data.ShootRecoil = 0 end
+            if data.ShootCooldown then data.ShootCooldown = 0.001 end
+            if data.ShootBurstCooldown then data.ShootBurstCooldown = 0.001 end
+        end
+    end
+
+    -- 近接武器の高速化
+    for name, data in pairs(Items) do
+        if typeof(data) == "table" then
+            if data.AttackCooldown then data.AttackCooldown = 0.001 end
+            if data.SwingCooldown then data.SwingCooldown = 0.001 end
+            if data.MeleeCooldown then data.MeleeCooldown = 0.001 end
+            if data.Cooldown then data.Cooldown = 0.001 end
+            if data.RecoveryTime then data.RecoveryTime = 0.001 end
+            if data.ResetTime then data.ResetTime = 0.001 end
+        end
+    end
+
+    
+end
+
+
 local __z2a3b4 = setmetatable({}, {
     __index = function(_, __c5d6e7)
         local __f8g9h0 = _lp.Character
